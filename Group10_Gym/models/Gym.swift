@@ -7,29 +7,35 @@
 import Foundation
 
 class Gym {
+    // Dictionary to store services with the service ID as the key
+    var services: [String: Service] = [:]
     
-    // Array to store all services added to the gym (such as Fitness Classes, Personal Trainings, etc.)
-    var services: [Service] = []
-    
-    // Throws an error if adding the service fails
+    // Method to add a service to the gym
     func addService(_ service: Service) throws {
-        services.append(service)  // Adds the provided service to the `services` array
+        if services[service.id] != nil {
+            throw ServiceError.invalidId // Prevent duplicate IDs
+        }
+        services[service.id] = service
     }
     
-    // Method to search for services by training type
+    // Method to search services by keyword
     func searchService(keyword: String) -> [Service] {
-        return services.filter {
-            // Lowercase both the `trainingType` and keyword for case-insensitive comparison
+        return services.values.filter {
+            // Case-insensitive search on trainingType
             $0.trainingType.lowercased().contains(keyword.lowercased())
         }
     }
     
-    // Method to list all services currently in the gym
+    // Method to list all services in the gym
     func listAllServices() {
         print("All Services:")
-        for service in services {
-            // Print detailed service info for each service in the array
+        for service in services.values {
             print(service.serviceInfo)
         }
+    }
+    
+    // Method to get a service by its ID 
+    func getService(byId id: String) -> Service? {
+        return services[id]
     }
 }

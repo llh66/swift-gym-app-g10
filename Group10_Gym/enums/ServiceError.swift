@@ -2,7 +2,7 @@
 //  ServiceError.swift
 //  Group10_Gym
 //
-//  Created by David Dang on 2025-01-21.
+//  Created by David Dang on 2025-01-16.
 //
 
 import Foundation

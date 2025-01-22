@@ -8,8 +8,10 @@
 import Foundation
 
 enum MemberError: Error {
+    case invalidName
     case invalidAmount
     case insufficientBalance
     case invalidService
     case duplicateBooking
+    case attendedService
 }

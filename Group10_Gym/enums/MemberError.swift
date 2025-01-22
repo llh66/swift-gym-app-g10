@@ -2,7 +2,7 @@
 //  MemberError.swift
 //  Group10_Gym
 //
-//  Created by LLH on 2025-01-20.
+//  Created by LLH on 2025-01-16.
 //
 
 import Foundation

@@ -40,8 +40,8 @@ class Service: IsPurchasable {
     }
     
     // Computed property that returns the detailed service information
-    var serviceInfo: String {
+    var serviceInfo: [String: Any] {
         // Returns a formatted string that provides detailed information about the service
-        return "______________ Service Information ______________\nService ID: \(id) \nWorkout Type: \(trainingType) \nTotal Sessions: \(totalSessions) \nPrice: $\(price)"
+        return ["Service ID": id, "Workout Type": trainingType, "Total Sessions": totalSessions, "Price": price]
     }
 }

@@ -35,8 +35,10 @@ class FitnessClass: Service {
     }
     
     // Computed property to return information about the service, overriding the serviceInfo from the parent class
-    override var serviceInfo: String {
-        // Return the superclass's service information, appending specific details for FitnessClass
-        return super.serviceInfo + "\nDuration: \(duration) minutes \nTrainer: \(trainerName)"
+    override var serviceInfo: [String: Any] {
+        var serviceInfo = super.serviceInfo
+        serviceInfo["Duration"] = duration
+        serviceInfo["Trainer"] = trainerName
+        return serviceInfo
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 
 // Initialize a Gym object to store all gym services
 let gym = Gym()
+var member: Member?
 
 // Adding some initial services to the gym
 do {
@@ -22,6 +23,171 @@ do {
     print("Error adding initial services: \(error)")
 }
 
+while true {
+    print("\nWelcome to the Gym System!")
+    print("1. Enter as owner")
+    print("2. Enter as member")
+    print("3. Exit")
+    print("Enter your choice: ", terminator: "")
+    if let option = Int(readLine() ?? "") {
+        switch(option) {
+        case 1:
+            gymOwnerMenu()
+        case 2:
+            gymMemberMenu()
+        case 3:
+            exit(0)
+        default:
+            print("\nPlease enter 1, 2, or 3")
+        }
+    }
+    else {
+        print("\nPlease enter 1, 2, or 3")
+    }
+}
+
+
+func gymMemberMenu() {
+    while true {
+        print("\nGym Member Menu:")
+        print("1. Join the gym")
+        print("2. Check credit points")
+        print("3. Reload credit points")
+        print("4. Search for service")
+        print("5. List your service")
+        print("6. Purchase service")
+        print("7. Attend session")
+        print("8. Cancel service")
+        print("9. Go back")
+        print("Enter your choice: ", terminator: "")
+        if let option = Int(readLine() ?? ""), (option >= 1 && option <= 9) {
+            if option != 1, option != 9, member == nil {
+                print("\nPlease join the gym first")
+                continue
+            }
+            
+            switch(option) {
+            case 1:
+                joinTheGym()
+            case 2:
+                print(member!.checkBalance())
+            case 3:
+                reloadCreditPoints()
+            case 4:
+                searchForService()
+            case 5:
+                member!.viewBookedService()
+            case 6:
+                purchaseService()
+            case 7:
+                attendSession()
+            case 8:
+                cancelService()
+            case 9:
+                member = nil
+                return
+            default:
+                print("\nPlease enter an integer between 1 and 9")
+            }
+        }
+        else {
+            print("\nPlease enter an integer between 1 and 9")
+        }
+    }
+}
+
+func joinTheGym() {
+    do {
+        print("Please enter your name: ", terminator: "")
+        if let name = readLine() {
+            member = try Member(name: name, gym: gym)
+            print("Welcome, \(member!.name)")
+        }
+    } catch {
+        switch(error) {
+        case MemberError.invalidName:
+            print("\nInvalid name. Please try again.")
+        default:
+            print("\n\(error)")
+        }
+    }
+}
+
+func reloadCreditPoints() {
+    do{
+        print("Please enter the reloading amount: ", terminator: "")
+        if let amount = Double(readLine() ?? "") {
+            try member!.reloadCreditBalance(by: amount)
+        }
+        else {
+            throw MemberError.invalidAmount
+        }
+    } catch {
+        switch(error) {
+        case MemberError.invalidAmount:
+            print("\nInvalid input. Please enter a positive number.")
+        default:
+            print("\n\(error)")
+        }
+    }
+}
+
+func purchaseService() {
+    do{
+        print("Please enter the service id to purchase: ", terminator: "")
+        if let id = readLine() {
+            try member!.bookService(id)
+            print(member!.checkBalance())
+        }
+    } catch {
+        switch(error) {
+        case MemberError.invalidService:
+            print("\nService not found. Please enter a valid id.")
+        case MemberError.insufficientBalance:
+            print("\nInsufficient balance. Please reload first.")
+        case MemberError.duplicateBooking:
+            print("\nService purchased already")
+        default:
+            print("\n\(error)")
+        }
+    }
+}
+
+func attendSession() {
+    do{
+        print("Please enter the service id to attend: ", terminator: "")
+        if let id = readLine() {
+            try member!.markAttendence(id)
+        }
+    } catch {
+        switch(error) {
+        case MemberError.invalidService:
+            print("\nService not found. Please enter a valid id or purchase the service first.")
+        default:
+            print("\n\(error)")
+        }
+    }
+}
+
+func cancelService() {
+    do{
+        print("Please enter the service id to cancel: ", terminator: "")
+        if let id = readLine() {
+            try member!.cancelService(id)
+            print(member!.checkBalance())
+        }
+    } catch {
+        switch(error) {
+        case MemberError.invalidService:
+            print("\nService not found. Please make sure it is valid or purchased.")
+        case MemberError.attendedService:
+            print("\nYou cannot cancel a service that has already been attended.")
+        default:
+            print("\n\(error)")
+        }
+    }
+}
+
 // Function to display the Gym Owner menu and interact with the user
 func gymOwnerMenu() {
     while true {
@@ -30,7 +196,7 @@ func gymOwnerMenu() {
         print("1. Create new service")
         print("2. Search for service")
         print("3. List all services")
-        print("4. Exit")
+        print("4. Go back")
         print("Enter your choice: ", terminator: "")
         
         // Read input from the owner for the menu choice
@@ -215,7 +381,3 @@ func searchForService() {
         }
     }
 }
-
-// Start the program and show the gym owner menu
-print("Welcome to the Gym Owner Menu System!")
-gymOwnerMenu()

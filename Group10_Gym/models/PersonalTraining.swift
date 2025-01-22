@@ -35,7 +35,10 @@ class PersonalTraining: Service {
     }
     
     // Computed property to get information about the personal training service
-    override var serviceInfo: String {
-        return super.serviceInfo + " \nTrainer: \(trainerName) \nSession Time: \(sessionTime)"
+    override var serviceInfo: [String: Any] {
+        var serviceInfo = super.serviceInfo
+        serviceInfo["Trainer"] = trainerName
+        serviceInfo["Session Time"] = sessionTime
+        return serviceInfo
     }
 }

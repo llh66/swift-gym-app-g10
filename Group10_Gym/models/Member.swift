@@ -12,27 +12,97 @@ class Member {
     let id: String
     let name: String
     var creditBalance: Double = 0
-//    var storedServices = [String: [String: Int]]()
+    var bookedServices = [String: [String: Int]]()
+    var gym: Gym
     
-    init(name: String) {
+    init(name: String, gym: Gym) throws {
+        guard !name.isEmpty, name.first != " ", name.last != " " else {
+            throw MemberError.invalidName
+        }
         self.id = String(Member.count)
         Member.count += 1
         self.name = name
+        self.gym = gym
     }
     
-    //bookService
-    //cancelService
-    //viewBookedService
+    func bookService(_ id: String) throws {
+        guard let service = gym.services[id] else {
+            throw MemberError.invalidService
+        }
+        
+        if let _ = bookedServices[id] {
+            throw MemberError.duplicateBooking
+        }
+        
+        guard self.creditBalance >= service.price else {
+            throw MemberError.insufficientBalance
+        }
+        
+        self.bookedServices[id] = ["totalSessions": service.totalSessions, "attendedSessions": 0]
+            creditBalance -= service.price
+        print("\nThank you! Service \(service.id) booked. Receipt:")
+        service.printReceipt(transactionType: "Purchase", amount: service.price)
+    }
+    
+    func cancelService(_ id: String) throws {
+        if let serviceHistory = bookedServices[id] {
+            guard serviceHistory["attendedSessions"]! == 0 else {
+                throw MemberError.attendedService
+            }
+            
+            self.bookedServices.removeValue(forKey: id)
+            self.creditBalance += gym.services[id]!.price
+            print("\nService \(id) cancelled. Receipt:")
+            gym.services[id]!.printReceipt(transactionType: "Refund", amount: gym.services[id]!.price)
+        }
+        else {
+            throw MemberError.invalidService
+        }
+    }
+    
+    func viewBookedService() {
+        if bookedServices.count == 0 {
+            print("\nNo services booked yet.")
+            return
+        }
+        
+        print("\nBooked service(s): ")
+        
+        for (id, bookedService) in bookedServices {
+            print([
+                "service": gym.services[id]?.serviceInfo ?? "",
+                "attendedSessions": bookedService["attendedSessions"]!
+                  ])
+        }
+    }
+    
     func checkBalance() -> String {
         return "Credit Balance: $\(creditBalance)"
     }
     
-    func reloadCreditBalance(_ amount: Double) throws {
-        guard amount >= 0 else {
+    func reloadCreditBalance(by amount: Double) throws {
+        guard amount > 0 else {
             throw MemberError.invalidAmount
         }
         
         creditBalance += round(amount * 100) / 100
+        print("\nNew " + self.checkBalance())
     }
-    //markAttendence
+    
+    func markAttendence(_ id: String) throws {
+        if let _ = bookedServices[id] {
+            self.bookedServices[id]!["attendedSessions"]! += 1
+            print("\nAttended \(id), progress: ")
+            print([
+                "totalSessions": self.bookedServices[id]!["totalSessions"]!,
+                "attendedSessions": self.bookedServices[id]!["attendedSessions"]!])
+            if self.bookedServices[id]!["attendedSessions"]! == self.bookedServices[id]!["totalSessions"]! {
+                print("Congrats on completing all sessions!")
+                self.bookedServices.removeValue(forKey: id)
+            }
+        }
+        else {
+            throw MemberError.invalidService
+        }
+    }
 }

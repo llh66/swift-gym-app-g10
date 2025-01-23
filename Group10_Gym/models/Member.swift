@@ -70,14 +70,14 @@ class Member {
         
         for (id, bookedService) in bookedServices {
             print([
-                "service": gym.services[id]?.serviceInfo ?? "",
-                "attendedSessions": bookedService["attendedSessions"]!
+                "service": gym.services[id]!.serviceInfo,
+                "attended sessions": bookedService["attendedSessions"]!
                   ])
         }
     }
     
     func checkBalance() -> String {
-        return "Credit Balance: $\(creditBalance)"
+        return "Credit Balance: $\(round(creditBalance * 100) / 100)"
     }
     
     func reloadCreditBalance(by amount: Double) throws {
@@ -85,17 +85,18 @@ class Member {
             throw MemberError.invalidAmount
         }
         
-        creditBalance += round(amount * 100) / 100
+        creditBalance += amount
         print("\nNew " + self.checkBalance())
     }
     
     func markAttendence(_ id: String) throws {
-        if let _ = bookedServices[id] {
+        if let bookedService = bookedServices[id] {
             self.bookedServices[id]!["attendedSessions"]! += 1
             print("\nAttended \(id), progress: ")
             print([
-                "totalSessions": self.bookedServices[id]!["totalSessions"]!,
-                "attendedSessions": self.bookedServices[id]!["attendedSessions"]!])
+                "service id": id,
+                "total sessions": self.bookedServices[id]!["totalSessions"]!,
+                "attended sessions": self.bookedServices[id]!["attendedSessions"]!])
             if self.bookedServices[id]!["attendedSessions"]! == self.bookedServices[id]!["totalSessions"]! {
                 print("Congrats on completing all sessions!")
                 self.bookedServices.removeValue(forKey: id)

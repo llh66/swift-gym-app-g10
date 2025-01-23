@@ -84,7 +84,6 @@ func gymMemberMenu() {
             case 8:
                 cancelService()
             case 9:
-                member = nil
                 return
             default:
                 print("\nPlease enter an integer between 1 and 9")

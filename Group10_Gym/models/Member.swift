@@ -11,7 +11,7 @@ class Member {
     static var count: Int = 0
     let id: String
     let name: String
-    var creditBalance: Double = 0
+    var creditBalance: Double = 100
     var bookedServices = [String: [String: Int]]()
     var gym: Gym
     

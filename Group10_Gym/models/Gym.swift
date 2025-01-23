@@ -69,7 +69,7 @@ class Gym {
     }
 
     
-    // Method to get a service by its ID (polymorphic behavior)
+    // Method to get a service by its ID 
     func getService(byId id: String) -> Service? {
         return services[id]
     }

@@ -64,7 +64,6 @@ class Gym {
                 }
                 print("\(key): \(value)")
             }
-            print()  // To add a blank line after each service
         }
     }
 

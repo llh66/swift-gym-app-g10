@@ -26,13 +26,24 @@ class Gym {
         }
     }
     
-    // Method to list all services in the gym
     func listAllServices() {
         print("All Services:")
         for service in services.values {
-            print(service.serviceInfo)
+            print("Service ID: \(service.id)")
+            print("Workout Type: \(service.trainingType)")
+            print("Total Sessions: \(service.totalSessions)")
+            print("Price: $\(service.price)")
+            for (key, value) in service.serviceInfo {
+                // Skip already printed properties
+                if key == "Service ID" || key == "Workout Type" || key == "Total Sessions" || key == "Price" {
+                    continue
+                }
+                print("\(key): \(value)")
+            }
+            print()  // To add a blank line after each service value
         }
     }
+
     
     // Method to get a service by its ID (polymorphic behavior)
     func getService(byId id: String) -> Service? {

@@ -222,143 +222,79 @@ func gymOwnerMenu() {
 
 // Function to handle creation of a new service (Fitness Class or Personal Training)
 func createNewService() {
-    var serviceType: Int?
+    // Get service type
+    var serviceType: Int
     repeat {
-        // Prompt for the service type (Fitness Class or Personal Training)
-        print("Enter service type (1 for Fitness Class, 2 for Personal Training): ", terminator: "")
-        
-        // Read input and check if it's valid (1 or 2)
-        if let typeChoice = readLine(), let inputType = Int(typeChoice), (inputType == 1 || inputType == 2) {
-            serviceType = inputType  // Store the selected service type
+        print("Enter service type (1 for FitnessClass, 2 for PersonalTraining): ", terminator: "")
+        serviceType = Int(readLine() ?? "") ?? 0
+        if serviceType != 1 && serviceType != 2 {
+            print("Invalid service type. Please enter 1 or 2.")
+        }
+    } while serviceType != 1 && serviceType != 2
+
+    // Get common service details
+    let id = getValidInput("Enter service ID: ", errorType: .invalidId) { !$0.isEmpty }
+    let trainingType = getValidInput("Enter training type: ", errorType: .invalidTrainningType) { !$0.isEmpty }
+    let totalSessions = getValidInput("Enter total number of sessions: ", errorType: .invalidSessions) { Int($0) ?? 0 > 0 }
+    let price = getValidInput("Enter price: ", errorType: .invalidPrice) { Double($0) ?? 0 > 0 }
+
+    do {
+        let newService: Service
+        if serviceType == 1 {
+            // Get FitnessClass specific details
+            let duration = getValidInput("Enter duration (in minutes): ", errorType: .invalidDuration) { Int($0) ?? 0 > 0 }
+            let trainerName = getValidInput("Enter trainer name: ", errorType: .invalidTrainerName) { !$0.isEmpty }
+            // Create FitnessClass instance
+            newService = try FitnessClass(id: id, trainingType: trainingType, totalSessions: Int(totalSessions)!, price: Double(price)!, duration: Int(duration)!, trainerName: trainerName)
         } else {
-            print("Error: Invalid choice. Please enter 1 for Fitness Class or 2 for Personal Training.")
+            // Get PersonalTraining specific details
+            let trainerName = getValidInput("Enter trainer name: ", errorType: .invalidTrainerName) { !$0.isEmpty }
+            let sessionTime = getValidInput("Enter session time: ", errorType: .invalidSessionTime) { !$0.isEmpty }
+            // Create PersonalTraining instance
+            newService = try PersonalTraining(id: id, trainingType: trainingType, totalSessions: Int(totalSessions)!, price: Double(price)!, trainerName: trainerName, sessionTime: sessionTime)
         }
-    } while serviceType == nil
-
-    var isValidServiceCreated = false
-    repeat {
-        do {
-            // Collect service ID
-            var id: String
-            repeat {
-                print("Enter service ID: ", terminator: "")
-                id = readLine() ?? ""
-                if id.isEmpty {
-                    throw ServiceError.invalidId  // Raise an error if ID is empty
-                }
-            } while id.isEmpty
-
-            // Collect training type
-            var trainingType: String
-            repeat {
-                print("Enter training type: ", terminator: "")
-                trainingType = readLine() ?? ""
-                if trainingType.isEmpty {
-                    throw ServiceError.invalidTrainningType
-                }
-            } while trainingType.isEmpty
-            var totalSessions: Int = 0
-            repeat {
-                print("Enter total number of sessions: ", terminator: "")
-                if let inputSessions = Int(readLine() ?? ""), inputSessions > 0 {
-                    totalSessions = inputSessions  // Store the valid number of sessions
-                } else {
-                    throw ServiceError.invalidSessions  // Raise an error if input is invalid
-                }
-            } while totalSessions <= 0  // Repeat until valid number of sessions is provided
-
-            // Collect price of the service
-            var price: Double = 0.0
-            repeat {
-                print("Enter price: ", terminator: "")
-                if let inputPrice = Double(readLine() ?? ""), inputPrice > 0 {
-                    price = inputPrice  // Store the valid price
-                } else {
-                    throw ServiceError.invalidPrice
-                }
-            } while price <= 0
-
-            // If FitnessClass service is selected, collect specific details
-            if serviceType == 1 {
-                var duration: Int = 0
-                repeat {
-                    print("Enter duration (in minutes): ", terminator: "")
-                    if let inputDuration = Int(readLine() ?? ""), inputDuration > 0 {
-                        duration = inputDuration  // Store valid duration
-                    } else {
-                        throw ServiceError.invalidDuration
-                    }
-                } while duration <= 0
-
-                // Collect trainer's name for FitnessClass
-                var trainerName: String
-                repeat {
-                    print("Enter trainer name: ", terminator: "")
-                    trainerName = readLine() ?? ""
-                    if trainerName.isEmpty {
-                        throw ServiceError.invalidTrainerName
-                    }
-                } while trainerName.isEmpty  // Repeat until trainer name is provided
-
-                // Create a new FitnessClass instance and add it to the gym
-                let newService = try FitnessClass(id: id, trainingType: trainingType, totalSessions: totalSessions, price: price, duration: duration, trainerName: trainerName)
-                try gym.addService(newService)  // Add service to the gym
-                print("A Fitness service added successfully.")
-
-            } else {
-                // If PersonalTraining service is selected, collect specific details
-                var trainerName: String
-                repeat {
-                    print("Enter trainer name: ", terminator: "")
-                    trainerName = readLine() ?? ""
-                    if trainerName.isEmpty {
-                        throw ServiceError.invalidTrainerName
-                    }
-                } while trainerName.isEmpty  // Repeat until trainer name is provided
-
-                // Collect session time for PersonalTraining
-                var sessionTime: String
-                repeat {
-                    print("Enter session time: ", terminator: "")
-                    sessionTime = readLine() ?? ""
-                    if sessionTime.isEmpty {
-                        throw ServiceError.invalidSessionTime
-                    }
-                } while sessionTime.isEmpty  // Repeat until session time is provided
-
-                // Create a new PersonalTraining instance and add it to the gym
-                let newService = try PersonalTraining(id: id, trainingType: trainingType, totalSessions: totalSessions, price: price, trainerName: trainerName, sessionTime: sessionTime)
-                try gym.addService(newService)  // Add service to the gym
-                print("A personal training service added successfully.")
-            }
-
-            // If service is successfully created, exit the loop
-            isValidServiceCreated = true
-
-        } catch let error as ServiceError {
-            // Catch specific service-related errors and print corresponding messages
-            switch error {
-            case .invalidId:
-                print("Error: ID cannot be empty.")
-            case .invalidTrainningType:
-                print("Error: Training type cannot be empty.")
-            case .invalidSessions:
-                print("Error: The number of sessions must be greater than zero.")
-            case .invalidPrice:
-                print("Error: The price must be a positive number.")
-            case .invalidDuration:
-                print("Error: Duration cannot be negative.")
-            case .invalidTrainerName:
-                print("Error: Trainer name cannot be empty.")
-            case .invalidSessionTime:
-                print("Error: Session time must be filled.")
-            }
-        } catch {
-            // Catch any other unexpected errors
-            print("An unexpected error occurred.")
-        }
-    } while !isValidServiceCreated  // Repeat until a valid service is created
+        
+        // Add the new service to the gym
+        try gym.addService(newService)
+        print("Service added successfully.")
+    } catch {
+             handleServiceError(error as? ServiceError ?? .invalidId)
+    }
 }
+
+// Helper function to get valid input from the user
+func getValidInput(_ prompt: String, errorType: ServiceError, isValid: (String) -> Bool) -> String {
+    var input: String
+    repeat {
+        print(prompt, terminator: "")
+        input = readLine() ?? ""
+        if !isValid(input) {
+            handleServiceError(errorType)
+        }
+    } while !isValid(input)
+    return input
+}
+
+// Function to handle and display service-related errors
+func handleServiceError(_ error: ServiceError) {
+    switch error {
+    case .invalidId:
+        print("Error: ID cannot be empty.")
+    case .invalidTrainningType:
+        print("Error: Training type cannot be empty.")
+    case .invalidSessions:
+        print("Error: The number of sessions must be greater than zero.")
+    case .invalidPrice:
+        print("Error: The price must be a positive number.")
+    case .invalidDuration:
+        print("Error: Duration must be greater than zero.")
+    case .invalidTrainerName:
+        print("Error: Trainer name cannot be empty.")
+    case .invalidSessionTime:
+        print("Error: Session time must be filled.")
+    }
+}
+
 
 // Function to search for a service in the gym by keyword
 func searchForService() {

@@ -45,18 +45,19 @@ class Gym {
                     resultString += "\(key): \(value)\n"
                 }
             }
-            
             return resultString
         }
     }
 
     func listAllServices() {
-        print("All Services:")
+        print("\nAll Services:\n")
         for service in services.values {
             print("Service ID: \(service.id)")
             print("Workout Type: \(service.trainingType)")
             print("Total Sessions: \(service.totalSessions)")
-            print("Price: $\(String(format: "%.2f", service.price))\n")
+            print("Price: $\(String(format: "%.2f", service.price))")
+            
+            // Now, print any additional service-specific information
             for (key, value) in service.serviceInfo {
                 // Skip already printed properties
                 if key == "Service ID" || key == "Workout Type" || key == "Total Sessions" || key == "Price" {
@@ -64,11 +65,11 @@ class Gym {
                 }
                 print("\(key): \(value)")
             }
+            print("") // Add a blank line between services
         }
     }
-
     
-    // Method to get a service by its ID 
+    // Method to get a service by its ID
     func getService(byId id: String) -> Service? {
         return services[id]
     }

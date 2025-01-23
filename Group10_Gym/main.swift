@@ -305,14 +305,9 @@ func searchForService() {
         return
     }
     
-    // Search for services in the gym by the keyword
+    // Call the Gym's searchService method to get the formatted results
     let results = gym.searchService(keyword: keyword)
-    if results.isEmpty {
-        print("No services found matching the keyword.")
-    } else {
-        print("Search results:")
-        for service in results {
-            print(service.serviceInfo)
-        }
-    }
+    
+    // Print the results returned from the Gym class
+    print(results)
 }

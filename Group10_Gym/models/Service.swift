@@ -32,6 +32,7 @@ class Gym {
             var resultString = "Search results for keyword: '\(keyword)':\n"
             
             for service in results {
+                resultString += "\n"  // Blank line between services
                 resultString += "\nService ID: \(service.id)\n"
                 resultString += "Workout Type: \(service.trainingType)\n"
                 resultString += "Total Sessions: \(service.totalSessions)\n"
@@ -45,7 +46,6 @@ class Gym {
                     }
                     resultString += "\(key): \(value)\n"
                 }
-                resultString += "\n"  
             }
             
             return resultString
@@ -55,6 +55,7 @@ class Gym {
     func listAllServices() {
         print("All Services:")
         for service in services.values {
+            print()  // To add a blank line after each service
             print("Service ID: \(service.id)")
             print("Workout Type: \(service.trainingType)")
             print("Total Sessions: \(service.totalSessions)")
@@ -66,7 +67,6 @@ class Gym {
                 }
                 print("\(key): \(value)")
             }
-            print()  
         }
     }
 
